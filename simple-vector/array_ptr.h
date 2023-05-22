@@ -11,20 +11,15 @@ public:
     // Создаёт в куче массив из size элементов типа Type.
     // Если size == 0, поле raw_ptr_ должно быть равно nullptr
     explicit ArrayPtr(size_t size) {
-        if (size == 0) {
-            raw_ptr_ = nullptr;
-        } else {
-            try {
-                raw_ptr_ = new Type [size]{};
-            } catch (std::bad_alloc & exception) {
-                delete [] raw_ptr_;
-                throw;
-            }
+        if (size > 0) {
+            raw_ptr_ = new Type [size]{};
         }
     }
 
     // Конструктор из сырого указателя, хранящего адрес массива в куче либо nullptr
     explicit ArrayPtr(Type* raw_ptr) noexcept  : raw_ptr_(raw_ptr) {}
+    
+    explicit ArrayPtr(ArrayPtr && other) : raw_ptr_(other.Release()) {}
 
     // Запрещаем копирование
     ArrayPtr(const ArrayPtr&) = delete;
@@ -35,6 +30,13 @@ public:
 
     // Запрещаем присваивание
     ArrayPtr& operator=(const ArrayPtr&) = delete;
+    ArrayPtr& operator=(ArrayPtr&& other) {
+        if (this != &other) {
+            delete [] raw_ptr_;
+            raw_ptr_ = other.Release();
+        }
+        return *this;
+    };
 
     // Прекращает владением массивом в памяти, возвращает значение адреса массива
     // После вызова метода указатель на массив должен обнулиться
@@ -56,7 +58,7 @@ public:
 
     // Возвращает true, если указатель ненулевой, и false в противном случае
     explicit operator bool() const {
-        return raw_ptr_ ? true : false;
+        return raw_ptr_;
     }
 
     // Возвращает значение сырого указателя, хранящего адрес начала массива

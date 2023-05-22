@@ -162,6 +162,7 @@ public:
     // Если перед вставкой значения вектор был заполнен полностью,
     // вместимость вектора должна увеличиться вдвое, а для вектора вместимостью 0 стать равной 1
     Iterator Insert(ConstIterator pos, const Type& value) {
+    	assert(pos >= begin() && pos <= end());
         size_t index = pos - begin();
         if (size_ < capacity_) {
             std::copy_backward(std::make_move_iterator(begin() + index), std::make_move_iterator(end()), end() + 1);
@@ -180,6 +181,7 @@ public:
     }
     
     Iterator Insert(ConstIterator pos, Type&& value) {
+    	assert(pos >= begin() && pos <= end());
         size_t index = pos - begin();
         if (size_ < capacity_) {
             std::copy_backward(std::make_move_iterator(begin() + index), std::make_move_iterator(end()), end() + 1);
@@ -199,6 +201,7 @@ public:
     
     // Удаляет элемент вектора в указанной позиции
     Iterator Erase(ConstIterator pos) {
+    	assert(pos >= begin() && pos < end());
         size_t index = pos - begin();
         std::copy(std::make_move_iterator(begin() + index + 1), std::make_move_iterator(end()), begin() + index);
         --size_;
